@@ -18,7 +18,7 @@ public class SimpleFactory implements  EntityFactory{
         return FXGL.entityBuilder(data)
                 //.view(new Rectangle(40, 40, Color.RED))
                 .view("brick.jpg")
-                .with(new ProjectileComponent(new Point2D(1,0), 150))
+                .with(new ProjectileComponent(new Point2D(1,0), 100))
                 .build();
     }
 
@@ -28,7 +28,7 @@ public class SimpleFactory implements  EntityFactory{
 
         return FXGL.entityBuilder(data)
                 .view(texture)
-                .with(new ProjectileComponent(new Point2D(-1,0), 150))
+                .with(new ProjectileComponent(new Point2D(-1,0), 100))
                 .build();
     }
 }

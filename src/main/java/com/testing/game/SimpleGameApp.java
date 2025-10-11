@@ -36,7 +36,7 @@ public class SimpleGameApp extends GameApplication {
                 new Rectangle2D(0,0,FXGL.getAppWidth(), FXGL.getAppHeight()))
             );
             FXGL.spawn("enemy", FXGLMath.randomPoint(
-                new Rectangle2D(10,0,FXGL.getAppWidth(), FXGL.getAppHeight()))
+                new Rectangle2D(0,0,FXGL.getAppWidth(), FXGL.getAppHeight()))
             );
         }, Duration.seconds(1));
     }

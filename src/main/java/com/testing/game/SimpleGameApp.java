@@ -14,9 +14,9 @@ public class SimpleGameApp extends GameApplication {
 
     @Override
     protected void initSettings(GameSettings settings) {
-        //settings.setWidth(800);
-        //settings.setHeight(600);
-        //settings.setTitle("Basic Game App");
+        settings.setWidth(1094);
+        settings.setHeight(825);
+        settings.setTitle("Mississippi");
     }
 
     @Override
@@ -29,16 +29,18 @@ public class SimpleGameApp extends GameApplication {
     @Override
     protected void initGame(){
         FXGL.getGameWorld().addEntityFactory(new SimpleFactory());
+        FXGL.getGameWorld().addEntityFactory(new GameboardFactory());
+        FXGL.spawn("background", 10, 10);
         //FXGL.spawn("enemy", 100, 100);
         //FXGL.spawn("ally", 600, 100);
-        FXGL.run(() -> {
+        /*FXGL.run(() -> {
             FXGL.spawn("ally", FXGLMath.randomPoint(
                 new Rectangle2D(0,0,FXGL.getAppWidth(), FXGL.getAppHeight()))
             );
             FXGL.spawn("enemy", FXGLMath.randomPoint(
                 new Rectangle2D(0,0,FXGL.getAppWidth(), FXGL.getAppHeight()))
             );
-        }, Duration.seconds(1));
+        }, Duration.seconds(1));*/
     }
 
     public static void main(String[] args) {

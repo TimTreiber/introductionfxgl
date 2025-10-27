@@ -17,8 +17,8 @@ public class SimpleFactory implements  EntityFactory{
     public Entity newEnemy(SpawnData data){
         return FXGL.entityBuilder(data)
                 //.view(new Rectangle(40, 40, Color.RED))
-                .view("brick.jpg")
-                .with(new ProjectileComponent(new Point2D(1,0), 100))
+                .view("Schwarze Spielfigur klein.png")
+                .with(new ProjectileComponent(new Point2D(1,0), 00))
                 .build();
     }
 

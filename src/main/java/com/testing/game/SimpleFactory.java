@@ -9,17 +9,14 @@ import com.almasb.fxgl.entity.Spawns;
 
 import javafx.geometry.Point2D;
 import javafx.scene.paint.Color;
-import javafx.scene.shape.Rectangle;
 
 public class SimpleFactory implements  EntityFactory{
 
-    @Spawns("enemy")
-    public Entity newEnemy(SpawnData data){
+    @Spawns("playerBlack")
+    public Entity newEnemy(SpawnData data){        
         return FXGL.entityBuilder(data)
-                //.view(new Rectangle(40, 40, Color.RED))
                 .view("Schwarze Spielfigur klein.png")
-                .with(new ProjectileComponent(new Point2D(1,0), 00))
-                .build();
+                .buildAndAttach();
     }
 
     @Spawns("ally")

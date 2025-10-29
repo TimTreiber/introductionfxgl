@@ -12,9 +12,12 @@ import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Text;
 import java.util.Map;
 
+import javax.swing.JTextField;
+
 import com.almasb.fxgl.core.math.FXGLMath;
 import static com.almasb.fxgl.dsl.FXGL.*;
 
+import javafx.event.ActionEvent;
 import javafx.geometry.Rectangle2D;
 import javafx.util.Duration;
 
@@ -44,6 +47,9 @@ public class SimpleGameApp extends GameApplication {
         generateBackground(9,9);
         player = FXGL.spawn("playerBlack", 100, 100);
         movePlayer(player, 3);
+        JTextField textField = new JTextField(20);
+        textField.addActionListener(this);
+
         
         //FXGL.spawn("ally", 600, 100);
         /*FXGL.run(() -> {
@@ -54,6 +60,10 @@ public class SimpleGameApp extends GameApplication {
                 new Rectangle2D(0,0,FXGL.getAppWidth(), FXGL.getAppHeight()))
             );
         }, Duration.seconds(1));*/
+    }
+
+    public void actionPerformed(ActionEvent evt) {
+        String text = textField.getText();
     }
 
     void movePlayer(Entity player, int fields){

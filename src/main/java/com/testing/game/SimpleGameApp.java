@@ -63,7 +63,7 @@ public class SimpleGameApp extends GameApplication {
                 break;
             case "move":
                 getDialogService().showInputBox("This is an input box. You can type stuff...", answer -> {
-                movePlayer(player, Integer.parseInt(answer));
+                tryMove(player, answer);
                 });
                 break;
             default:
@@ -79,7 +79,12 @@ public class SimpleGameApp extends GameApplication {
         Entity player = FXGL.spawn("playerBlack", 100, 100);
         ActivePlayer p1 = new ActivePlayer(player);
         gameField[0][0] = p1.getPlayer();
+        /*Entity player2 = FXGL.spawn("playerBlack", 100, 152);
+        ActivePlayer p2 = new ActivePlayer(player2);
+        gameField[0][1] = p2.getPlayer();*/
+
         currentPlayer = p1;
+
         /*FXGL.run(() -> {
             FXGL.spawn("ally", FXGLMath.randomPoint(
                 new Rectangle2D(0,0,FXGL.getAppWidth(), FXGL.getAppHeight()))
@@ -90,39 +95,122 @@ public class SimpleGameApp extends GameApplication {
         }, Duration.seconds(1));*/
     }
 
+    void tryMove(ActivePlayer player, String x){
+        int fields = 0;
+        try{
+            fields = Integer.parseInt(x);
+        }
+        catch(NumberFormatException e){
+            getNotificationService().pushNotification("Not a valid integer!");
+        }
+        movePlayer(player, fields);
+    }
+
     void movePlayer(ActivePlayer player, int fields){
-        if(player.useFuel(fields)){
+        if(fields < 0){
+            for(int i = 0; i > fields; i--){
+                if(player.getCoords().get(0) == 0 && player.getCoords().get(1) == 0){
+                    getNotificationService().pushNotification("Cannot move back further!");
+                    break;
+                }
+                simpleMovement(player, false);
+                player.addFuel(1);
+            }
+        }
+        else if(player.useFuel(fields)){
             for(int i = 0; i < fields; i++){
-                simpleMovement(player);
+                simpleMovement(player, true);
+                if(player.getCoords().get(0) == 8 && player.getCoords().get(1) == 8){
+                    getNotificationService().pushNotification("GG, you won!!");
+                    break;
+                }
             }
         }
         else getNotificationService().pushNotification("Not enough fuel!");
     }
 
-    void simpleMovement(ActivePlayer player){
-        List<Integer> list = nextField(0,0);
-        player.getPlayer().translateY(52);
+    void simpleMovement(ActivePlayer player, boolean forwards){
+        List<Integer> goal = player.getCoords();
+        int playerX = player.getCoords().get(0);
+        int playerY = player.getCoords().get(1);
+        gameField[playerX][playerY] = null;
+        boolean skip;
+        int x = 0;
+        int y = 0;
+        do
+        {
+            skip = false;
+            goal = nextField(goal, forwards);
+            x = goal.get(0);
+            y = goal.get(1);
+            if(gameField[x][y] != null) skip = true;
+        }
+        while(skip);
+        gameField[x][y] = player.getPlayer();
+        player.setCoords(goal);
+        if(x - playerX == 0 || x - playerX % 2 == 0){
+            player.getPlayer().translateX(46 * (x - playerX));
+            player.getPlayer().translateY(52 * (y - playerY));
+        }
+        else if(x % 2 == 0 && x - playerX % 2 != 0){
+            player.getPlayer().translateX(46 * (x - playerX));
+            player.getPlayer().translateY(-26 + 52 * (y - playerY));
+        }
+        else{
+            player.getPlayer().translateX(46 * (x - playerX));
+            player.getPlayer().translateY(26 + 52 * (y - playerY));
+        }
     }
 
-    private List<Integer> nextField(int x, int y){
-        List<Integer> list = new ArrayList<>();
-        if(x % 2 == 0 && y < 8){
-            list.add(x);
-            list.add(y+1);
+    private List<Integer> nextField(List<Integer> list, boolean forwards){
+        int x = list.get(0);
+        int y = list.get(1);
+        List<Integer> nextField = new ArrayList<>();
+        if(x >= 8 && y >= 8 && forwards){
+            nextField.add(8);
+            nextField.add(8);
         }
-        else if(x % 2 == 0 && y == 8){
-            list.add(x+1);
-            list.add(y-1);
+        else if(x <= 0 && y <= 0 && !forwards){
+            nextField.add(0);
+            nextField.add(0);
         }
-        else if(x % 2 != 0 && y > 0){
-            list.add(x);
-            list.add(y-1);
+        if(forwards){
+            if(x % 2 == 0 && y < 8){
+                nextField.add(x);
+                nextField.add(y+1);
+            }
+            else if(x % 2 == 0 && y == 8){
+                nextField.add(x+1);
+                nextField.add(y-1);
+            }
+            else if(x % 2 != 0 && y > 0){
+                nextField.add(x);
+                nextField.add(y-1);
+            }
+            else if(x % 2 != 0 && y == 0){
+                nextField.add(x+1);
+                nextField.add(y);
+            }
         }
-        else if(x % 2 != 0 && y == 0){
-            list.add(x+1);
-            list.add(y);
+        else if (!forwards){
+            if(x % 2 == 0 && y > 0){
+                nextField.add(x);
+                nextField.add(y-1);
+            }
+            else if(x % 2 == 0 && y == 0){
+                nextField.add(x-1);
+                nextField.add(y);
+            }
+            else if(x % 2 != 0 && y < 7){
+                nextField.add(x);
+                nextField.add(y+1);
+            }
+            else if(x % 2 != 0 && y == 7){
+                nextField.add(x-1);
+                nextField.add(y+1);
+            }
         }
-        return list;
+        return nextField;
     }
 
     void generateBackground(int row, int col){

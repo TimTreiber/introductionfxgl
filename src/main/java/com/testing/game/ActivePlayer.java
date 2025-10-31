@@ -22,6 +22,11 @@ public class ActivePlayer {
         return list;
     }
 
+    public void setCoords(List<Integer> list){
+        x = list.get(0);
+        y = list.get(1);
+    }
+
     public boolean useFuel(int amount){
         if(amount <= fuel){
             fuel -= amount;

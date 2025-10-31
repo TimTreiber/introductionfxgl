@@ -10,6 +10,10 @@ import javafx.scene.input.KeyCode;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Text;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 
 import javax.swing.JTextField;
@@ -24,6 +28,9 @@ import javafx.util.Duration;
 
 public class SimpleGameApp extends GameApplication {
 
+    public ActivePlayer currentPlayer;
+    public Entity[][] gameField = new Entity[9][9];
+
     @Override
     protected void initSettings(GameSettings settings) {
         settings.setWidth(800);
@@ -34,24 +41,45 @@ public class SimpleGameApp extends GameApplication {
     @Override
     protected void initInput() {
         onKeyDown(KeyCode.F, () ->{
-            getNotificationService().pushNotification("Hello World");
+            useInput("getFuel", currentPlayer);
+        });
+        onKeyDown(KeyCode.A, () ->{
+            useInput("addFuel", currentPlayer);
+        });
+        onKeyDown(KeyCode.M, () ->{
+            useInput("move", currentPlayer);
         });
     }
 
-    private Entity player;
+    public void useInput(String mode, ActivePlayer player){
+        switch (mode)
+        {
+            case "getFuel":
+                getNotificationService().pushNotification(String.format("Current Fuel: %d", player.getFuel()));
+                break;
+            case "addFuel":
+                player.addFuel(20);
+                getNotificationService().pushNotification("Added 20 Fuel!");
+                break;
+            case "move":
+                getDialogService().showInputBox("This is an input box. You can type stuff...", answer -> {
+                movePlayer(player, Integer.parseInt(answer));
+                });
+                break;
+            default:
+                break;
+        }
+    }
 
     @Override
     protected void initGame(){
         FXGL.getGameWorld().addEntityFactory(new SimpleFactory());
         FXGL.getGameWorld().addEntityFactory(new GameboardFactory());
         generateBackground(9,9);
-        player = FXGL.spawn("playerBlack", 100, 100);
-        movePlayer(player, 3);
-        JTextField textField = new JTextField(20);
-        textField.addActionListener(this);
-
-        
-        //FXGL.spawn("ally", 600, 100);
+        Entity player = FXGL.spawn("playerBlack", 100, 100);
+        ActivePlayer p1 = new ActivePlayer(player);
+        gameField[0][0] = p1.getPlayer();
+        currentPlayer = p1;
         /*FXGL.run(() -> {
             FXGL.spawn("ally", FXGLMath.randomPoint(
                 new Rectangle2D(0,0,FXGL.getAppWidth(), FXGL.getAppHeight()))
@@ -62,12 +90,39 @@ public class SimpleGameApp extends GameApplication {
         }, Duration.seconds(1));*/
     }
 
-    public void actionPerformed(ActionEvent evt) {
-        String text = textField.getText();
+    void movePlayer(ActivePlayer player, int fields){
+        if(player.useFuel(fields)){
+            for(int i = 0; i < fields; i++){
+                simpleMovement(player);
+            }
+        }
+        else getNotificationService().pushNotification("Not enough fuel!");
     }
 
-    void movePlayer(Entity player, int fields){
-        player.translateY(52*fields);
+    void simpleMovement(ActivePlayer player){
+        List<Integer> list = nextField(0,0);
+        player.getPlayer().translateY(52);
+    }
+
+    private List<Integer> nextField(int x, int y){
+        List<Integer> list = new ArrayList<>();
+        if(x % 2 == 0 && y < 8){
+            list.add(x);
+            list.add(y+1);
+        }
+        else if(x % 2 == 0 && y == 8){
+            list.add(x+1);
+            list.add(y-1);
+        }
+        else if(x % 2 != 0 && y > 0){
+            list.add(x);
+            list.add(y-1);
+        }
+        else if(x % 2 != 0 && y == 0){
+            list.add(x+1);
+            list.add(y);
+        }
+        return list;
     }
 
     void generateBackground(int row, int col){
@@ -87,7 +142,7 @@ public class SimpleGameApp extends GameApplication {
             if(i % 2 == 0) currentY = 100;
             else currentY = 100 + vertOffset/2;
             for(int j = 0; j < col; j++){
-                if(i % 2 != 0 && j + 1 == col) continue;
+                if(j + 1 == col && i % 2 != 0) continue;
                 FXGL.spawn("background", currentX, currentY);
                 currentY += vertOffset;
             }

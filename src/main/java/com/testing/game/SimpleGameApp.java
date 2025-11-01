@@ -31,6 +31,14 @@ public class SimpleGameApp extends GameApplication {
     public ActivePlayer currentPlayer;
     public Entity[][] gameField = new Entity[9][9];
 
+    /*  ToDo
+     *  add more fixed players
+     *  test skipping players
+     *  add player queue
+     *  add input for every player, cycle through players
+     *  daily streak update
+     */
+
     @Override
     protected void initSettings(GameSettings settings) {
         settings.setWidth(800);

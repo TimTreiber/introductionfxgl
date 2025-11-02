@@ -36,7 +36,7 @@ public class SimpleGameApp extends GameApplication {
      *  test skipping players
      *  add player queue
      *  add input for every player, cycle through players
-     *  daily streak update
+     *  daily streak update 2
      */
 
     @Override
